@@ -94,16 +94,30 @@ include "{{ dhcp_config_dir }}/{{ include | basename }}";
 {% for class in dhcp_global_classes %}
 class "{{ class.name }}" {
 {% if class.match is defined %}
-  {{ class.match }};
+{{ class.match }};
 {% endif %}
 }
 {% endfor %}
 {% endif %}
+
+{% if dhcp_global_subclasses is defined %}
+#
+# Subclasses
+#
+{% for subclass in dhcp_global_subclasses %}
+subclass "{{ subclass.parent }}" {% if subclass.value is defined %} {{ subclass.value }} {% endif %};
+{% endfor %}
+{% endif %}
+
+
+
+
 #
 # Subnet declarations
 #
 {% for subnet in dhcp_subnets %}
 subnet {{ subnet.ip }} netmask {{ subnet.netmask }} {
+
 {% if subnet.default_lease_time is defined %}
   default-lease-time {{ subnet.default_lease_time }};
 {% endif %}
